@@ -1,0 +1,21 @@
+{
+    "name": "pathum4u/api_request",
+    "description": "simple Lumen api request",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle":  "^7.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Pathum4u\\ApiRequest\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Chinthaka Abeykoon",
+            "email": "pathum4u@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}

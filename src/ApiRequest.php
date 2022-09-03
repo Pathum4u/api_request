@@ -1,10 +1,16 @@
 <?php
+
 namespace Pathum4u\ApiRequest;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use Pathum4u\ApiRequest\ApiResponse;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\BadResponseException;
 
 
-class ApiRequest
+class ApiRequest extends ApiResponse
 {
     /**
      * @var string
@@ -43,7 +49,7 @@ class ApiRequest
 
 
     /**
-     * constructer
+     * constructor
      *
      */
     public function __construct()
@@ -58,7 +64,7 @@ class ApiRequest
     public function service($service)
     {
         //
-        if($service = $this->checkService($service)){
+        if ($service = $this->checkService($service)) {
             $this->baseUri = $service['base_uri'];
             $this->secret = $service['secret'];
         }
@@ -70,11 +76,12 @@ class ApiRequest
      * Check Service
      *
      */
-    function checkService($service){
+    function checkService($service)
+    {
 
-        if(array_key_exists($service, $this->services)){
+        if (array_key_exists($service, $this->services)) {
             //
-            return config('services.'.$service);
+            return config('services.' . $service);
         }
 
         return dd('service not available');
@@ -84,7 +91,8 @@ class ApiRequest
      * method
      *
      */
-    public function method($method){
+    public function method($method)
+    {
         //
         $this->method = $method;
 
@@ -95,7 +103,8 @@ class ApiRequest
      * Get method
      *
      */
-    public function get($url){
+    public function get($url)
+    {
         //
         $this->method = 'get';
         $this->url($url);
@@ -107,7 +116,8 @@ class ApiRequest
      * Post method
      *
      */
-    public function post($url){
+    public function post($url)
+    {
         //
         $this->method = 'post';
         $this->url($url);
@@ -119,11 +129,12 @@ class ApiRequest
      * Url
      *
      */
-    public function url($url){
+    public function url($url)
+    {
         //
-        if($url){
+        if ($url) {
             $this->url = $url;
-        }else{
+        } else {
             return dd('url not valied');
         }
 
@@ -134,9 +145,10 @@ class ApiRequest
      * Url
      *
      */
-    public function params($v){
+    public function params($params)
+    {
         //
-        $this->params;
+        $this->params = $params;
 
         return $this;
     }
@@ -145,11 +157,12 @@ class ApiRequest
      * Headers
      *
      */
-    function headers($headers){
+    function headers($headers)
+    {
         //
-        if(is_array($headers)){
+        if (is_array($headers)) {
             array_merge($headers, $this->headers);
-        }else{
+        } else {
             return dd('Headers not in array');
         }
 
@@ -165,7 +178,8 @@ class ApiRequest
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($service, $method, $url, $params = [], $headers = []){
+    public function request($service, $method, $url, $params = [], $headers = [])
+    {
         //
         $this->service($service);
         $this->url($url);
@@ -173,9 +187,24 @@ class ApiRequest
         $this->params($params);
         $this->headers($headers);
 
-        $response = $this->send();
+        return $this->send();
+    }
 
-        return $response->getBody()->getContents();
+    /**
+     * Create request
+     *
+     * @response $request
+     */
+    public function set_request()
+    {
+        //
+        return  new Request(
+            $this->method,
+            $this->url,
+            [
+                'json' => $this->params
+            ]
+        );
     }
 
     /**
@@ -183,28 +212,48 @@ class ApiRequest
      *
      *
      */
-    public function send(){
+    public function send()
+    {
         //
-
         $client = new Client([
-            'base_uri' => $this->baseUri
+            'timeout'  => 2.0,
+            'base_uri' => $this->baseUri,
+            'headers' => [
+                'Authorization' => $this->secret,
+                'Accept'     => 'application/json',
+                'Content-Type'      => 'application/json'
+            ]
         ]);
 
+        try {
+            $response =  $client->request(
+                $this->method,
+                $this->url,
+                        [
+                            'json' => $this->params,
+                            'headers' => $this->headers
+                        ]
+                );
 
-        if ($this->secret) {
-            $this->headers['Authorization'] = $this->secret;
-            $this->headers['Accept'] = 'application/json';
-            $this->headers['Content-Type'] = 'application/json';
+            return $this->successResponse($response->getStatusCode(), $response->getBody()->getContents());
+        } catch (ClientException $e) {
+
+            return $this->errorResponse($e);
+        } catch (ServerException $e) {
+
+            return $this->errorResponse($e);
+        } catch (BadResponseException $e) {
+
+            return $this->errorResponse($e);
         }
-        dd($this->url);
 
-        return $client->request(
-            $this->method,
-            $this->url,
-            [
-                'json' => $this->params,
-                'headers' => $this->headers
-            ]
-        );
+        // return $client->request(
+        //     $this->method,
+        //     $this->url,
+        //     [
+        //         'json' => $this->params,
+        //         'headers' => $this->headers
+        //     ]
+        // );
     }
 }

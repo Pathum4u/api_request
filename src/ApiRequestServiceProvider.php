@@ -16,6 +16,10 @@ class ApiRequestServiceProvider extends ServiceProvider
     {
         //
         // $this->app->alias('ApiRequest', \Pathum4u\ApiRequest\ApiRequest::class);
+
+        $this->publishes([
+            __DIR__ . '/../config/services.php' => config_path('services.php'),
+        ]);
     }
 
     /**

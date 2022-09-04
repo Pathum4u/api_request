@@ -47,6 +47,10 @@ class ApiRequest extends ApiResponse
      */
     protected $headers = [];
 
+    /**
+     * @var bool
+     */
+    protected $debug = false;
 
     /**
      * constructor
@@ -154,6 +158,15 @@ class ApiRequest extends ApiResponse
     }
 
     /**
+     * Debug
+     *
+     */
+    public function debug($debug = true)
+    {
+        $this->debug = $debug;
+    }
+
+    /**
      * Headers
      *
      */
@@ -178,7 +191,7 @@ class ApiRequest extends ApiResponse
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($service, $method, $url, $params = [], $headers = [])
+    public function request($service, $method, $url, $params = [], $headers = [], $debug = false)
     {
         //
         $this->service($service);
@@ -186,6 +199,7 @@ class ApiRequest extends ApiResponse
         $this->method($method);
         $this->params($params);
         $this->headers($headers);
+        $this->debug($debug);
 
         return $this->send();
     }
@@ -227,12 +241,11 @@ class ApiRequest extends ApiResponse
 
         try {
             $response =  $client->request(
-                $this->method,
-                $this->url,
-                        [
-                            'json' => $this->params,
-                            'headers' => $this->headers
-                        ]
+                    $this->method,
+                    $this->url,
+                    [
+                        'json' => $this->params
+                    ]
                 );
 
             return $this->successResponse($response->getStatusCode(), $response->getBody()->getContents());
@@ -247,13 +260,5 @@ class ApiRequest extends ApiResponse
             return $this->errorResponse($e);
         }
 
-        // return $client->request(
-        //     $this->method,
-        //     $this->url,
-        //     [
-        //         'json' => $this->params,
-        //         'headers' => $this->headers
-        //     ]
-        // );
     }
 }

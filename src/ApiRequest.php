@@ -217,12 +217,7 @@ class ApiRequest extends ApiResponse
             $this->method,
             $this->url,
             [
-                'json' => $this->params,
-                'headers' => [
-                    'Authorization' => $this->secret,
-                    'Accept'     => 'application/json',
-                    'Content-Type'      => 'application/json'
-                ]
+                'json' => $this->params
             ]
         );
     }
@@ -265,8 +260,7 @@ class ApiRequest extends ApiResponse
 
             return $this->errorResponse($e);
         } catch(RequestException $e){
-
-            return $this->errorRequest($client, $this->set_request());
+            return $this->errorRequest($this);
         }
 
     }

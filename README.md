@@ -10,7 +10,22 @@ Requirement
 Installation 
 ------------
 
+```
+composer require pathum4u/api_request
+```
+
+
+Insert in app.php
+
+```
+$app->register(Pathum4u\ApiRequest\ApiRequestServiceProvider::class);
+```
+
 publish config
+
+```
+php artisan vendor:publish
+```
 
 or 
 

@@ -67,12 +67,16 @@ $client->send();
 Responses
 -------
 
+
 Success
+
+
 ```
 response()->json([$data], $statusCode)
 ```
 
 Errors
+
 
 ```
 response()->json(['error' => $response->getReasonPhrase(), 'message' => $this->errorMessage($responseBodyAsString)], $response->getStatusCode());

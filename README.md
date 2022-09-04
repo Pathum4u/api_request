@@ -42,9 +42,10 @@ $app->configure('services');
 Request
 -------
 
-use Pathum4u\ApiRequest\ApiRequest;
 
 ```
+use Pathum4u\ApiRequest\ApiRequest;
+
 $client = new ApiRequest();
 return $client->request('notification','POST', '/test', $request->all(),[]);
 ```

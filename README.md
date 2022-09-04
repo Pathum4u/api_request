@@ -1,6 +1,8 @@
 API Request for Multiple source With GuzzleHttp
 ========================================
 
+Simple Laravel\Lumen Micro service api request package(service to service).
+
 Requirement    
 ------------
 
@@ -94,7 +96,31 @@ Errors
 ```
 response()->json(['error' => $response->getReasonPhrase(), 'message' => $this->errorMessage($responseBodyAsString)], $response->getStatusCode());
 ```
+Other End
+---------
 
+Create & Register Middleware on other end to validate each request with token. Use same key on both ends
+
+```
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+        $allowedSecrets = explode(',', env('MY_SECRETS_TOKEN'));
+
+        if (in_array($request->header('Authorization'), $allowedSecrets)) {
+            return $next($request);
+        }
+
+        // 
+        return response()->json(['message' => 'unauthorized token'], 401);
+    }
+```
 Acknowledgments
 ---------------
 

@@ -21,28 +21,25 @@ Request
 
 use Pathum4u\ApiRequest\ApiRequest;
 
+```
 $client = new ApiRequest();
 return $client->request('notification','POST', '/test', $request->all(),[]);
+```
 
-
-
+```
 $client = new ApiRequest();
-
 $client->service('notification');
-
 $client->url('/');
-
 $client->params(['email'=> 'tese@tes.com']);
-
 $client->send();
+```
 
-
-
+```
 $client = new ApiRequest();
-
 $client->get('/');
-
 $client->send();
+```
+
 
 Response
 -------

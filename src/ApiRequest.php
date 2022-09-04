@@ -7,6 +7,7 @@ use GuzzleHttp\Psr7\Request;
 use Pathum4u\ApiRequest\ApiResponse;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\BadResponseException;
 
 
@@ -258,6 +259,9 @@ class ApiRequest extends ApiResponse
         } catch (BadResponseException $e) {
 
             return $this->errorResponse($e);
+        } catch(RequestException $e){
+
+            return $this->errorRequest($client, $this->set_request());
         }
 
     }

@@ -43,6 +43,19 @@ class  ApiResponse
 
     }
 
+
+    /**
+     * @param $errorMessage
+     * @param $statusCode
+     *
+     * @return mixed
+     */
+    public function errorRequest($client, $request)
+    {
+        //
+        return response()->json(['error' => 'Request Error', 'message' => 'Ooops! Something not ok in request', 'client' => $client, 'request' => $request ], 400);
+    }
+
     /**
      * @param $errorMessage
      * @param $statusCode

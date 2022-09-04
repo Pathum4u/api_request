@@ -1,4 +1,4 @@
-Simple API Request for Multiple source With GuzzleHttp
+API Request for Multiple source With GuzzleHttp
 ========================================
 
 Requirement    
@@ -12,9 +12,32 @@ Installation
 
 publish config
 
-Limen
-$app->configure('services');
+or 
 
+config -> services.php
+
+```
+<?php
+
+return [
+    'user' => [
+        'base_uri' => env('USER_SERVICE_URI'),
+        'secret' => env('USER_SERVICE_SECRET')
+    ],
+
+    'notification' => [
+        'base_uri' => env('NOTIFICATION_SERVICE_URI'),
+        'secret' => env('NOTIFICATION_SERVICE_SECRET')
+    ],
+];
+```
+Then
+
+Limen -> app.php
+
+```
+$app->configure('services');
+``
 
 Request
 -------
@@ -41,22 +64,24 @@ $client->send();
 ```
 
 
-Response
+Responses
 -------
 
 Success
-
-json([$data], $statusCode)
+```
+response()->json([$data], $statusCode)
+```
 
 Errors
 
-json(['error' => $response->getReasonPhrase(), 'message' => $this->errorMessage($responseBodyAsString)], $response->getStatusCode());
-
+```
+response()->json(['error' => $response->getReasonPhrase(), 'message' => $this->errorMessage($responseBodyAsString)], $response->getStatusCode());
+```
 
 Acknowledgments
 ---------------
 
-This project designed for specific needs of one of my project, This may not for everyone. 
+This project created specific requirements for one of my projects, this may not for everyone.
 
 
 Worked & Tested 

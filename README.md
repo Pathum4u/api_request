@@ -3,11 +3,6 @@ API Request for Multiple source With GuzzleHttp
 
 Simple Laravel\Lumen Micro service api request package(service to service).
 
-Requirement    
-------------
-
-"guzzlehttp/guzzle"
-
 
 Installation 
 ------------

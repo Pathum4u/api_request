@@ -2,7 +2,6 @@
 
 namespace Pathum4u\ApiRequest;
 
-
 class  ApiResponse
 {
     /**
@@ -14,7 +13,11 @@ class  ApiResponse
     public function successResponse($statusCode, $data)
     {
         //
-        return response()->json([$data], $statusCode);
+        if(!$data){
+            $data = 'success';
+        }
+
+        return response($data, $statusCode);
     }
 
     /**
@@ -40,7 +43,6 @@ class  ApiResponse
     public function errorMessage($errorMessage)
     {
         return json_decode($errorMessage)->message;
-
     }
 
 

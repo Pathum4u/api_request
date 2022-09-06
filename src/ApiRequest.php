@@ -63,6 +63,17 @@ class ApiRequest extends ApiResponse
     }
 
     /**
+     * Base url provider
+     *
+     */
+    public function base_url($url)
+    {
+        $this->baseUri = $url;
+
+        return $this;
+    }
+
+    /**
      * Service providers
      *
      */
@@ -231,7 +242,7 @@ class ApiRequest extends ApiResponse
     {
         //
         $client = new Client([
-            'timeout'  => 2.0,
+            'timeout'  => 10.0,
             'base_uri' => $this->baseUri,
             'headers' => [
                 'Authorization' => $this->secret,
@@ -240,8 +251,22 @@ class ApiRequest extends ApiResponse
             ]
         ]);
 
-        try {
+
+        if ($this->debug) {
+
             $response =  $client->request(
+                $this->method,
+                $this->url,
+                [
+                    'json' => $this->params
+                ]
+            );
+
+            return $response->getBody()->getContents();
+
+        } else {
+            try {
+                $response =  $client->request(
                     $this->method,
                     $this->url,
                     [
@@ -249,19 +274,19 @@ class ApiRequest extends ApiResponse
                     ]
                 );
 
-            return $this->successResponse($response->getStatusCode(), $response->getBody()->getContents());
-        } catch (ClientException $e) {
+                return $this->successResponse($response->getStatusCode(), $response->getBody()->getContents());
+            } catch (ClientException $e) {
 
-            return $this->errorResponse($e);
-        } catch (ServerException $e) {
+                return $this->errorResponse($e);
+            } catch (ServerException $e) {
 
-            return $this->errorResponse($e);
-        } catch (BadResponseException $e) {
+                return $this->errorResponse($e);
+            } catch (BadResponseException $e) {
 
-            return $this->errorResponse($e);
-        } catch(RequestException $e){
-            return $this->errorRequest($this);
+                return $this->errorResponse($e);
+            } catch (RequestException $e) {
+                return $this->errorRequest($this);
+            }
         }
-
     }
 }

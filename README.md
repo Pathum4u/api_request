@@ -76,6 +76,11 @@ $client->get('/');
 $client->send();
 ```
 
+to get real response use
+
+```
+$chanel->debug(true);
+```
 
 Responses
 -------

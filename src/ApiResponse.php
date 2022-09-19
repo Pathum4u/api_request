@@ -52,11 +52,12 @@ class  ApiResponse
      *
      * @return mixed
      */
-    public function errorRequest($client)
+    public function errorRequest($client, $errorMessage = 'Ooops! Something not ok in request')
     {
         //
-        return response()->json(['error' => 'Request Error', 'message' => 'Ooops! Something not ok in request', 'client' => $client], 400);
+        return response()->json(['error' => 'Request Error', 'message' => $errorMessage , 'client' => $client], 400);
     }
+
 
     /**
      * @param $errorMessage

@@ -26,7 +26,7 @@ class ApiRequest extends ApiResponse
     /**
      * @var string
      */
-    protected $services = [];
+    private $services = [];
 
     /**
      * @var string
@@ -52,6 +52,11 @@ class ApiRequest extends ApiResponse
      * @var bool
      */
     protected $debug = false;
+
+    /**
+     * @var bool
+     */
+    protected $verify = true;
 
     /**
      * constructor
@@ -179,6 +184,16 @@ class ApiRequest extends ApiResponse
     }
 
     /**
+     * Verify
+     *
+     */
+    public function verify($verify = true)
+    {
+        $this->verify = $verify;
+    }
+
+
+    /**
      * Headers
      *
      */
@@ -203,7 +218,7 @@ class ApiRequest extends ApiResponse
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($service, $method, $url, $params = [], $headers = [], $debug = false)
+    public function request($service, $method, $url, $params = [], $headers = [], $debug = false, $verify = true)
     {
         //
         $this->service($service);
@@ -212,7 +227,7 @@ class ApiRequest extends ApiResponse
         $this->params($params);
         $this->headers($headers);
         $this->debug($debug);
-
+        $this->verify($verify);
         return $this->send();
     }
 
@@ -258,7 +273,9 @@ class ApiRequest extends ApiResponse
                 $this->method,
                 $this->url,
                 [
-                    'json' => $this->params
+                    'json' => $this->params,
+                    'verify' => $this->verify,
+                    'debug' => $this->debug
                 ]
             );
 
@@ -270,7 +287,9 @@ class ApiRequest extends ApiResponse
                     $this->method,
                     $this->url,
                     [
-                        'json' => $this->params
+                        'json' => $this->params,
+                        'verify' => $this->verify,
+                        'debug' => $this->debug
                     ]
                 );
 
@@ -285,7 +304,8 @@ class ApiRequest extends ApiResponse
 
                 return $this->errorResponse($e);
             } catch (RequestException $e) {
-                return $this->errorRequest($this);
+
+                return $this->errorRequest($this, $e->getHandlerContext()['error']);
             }
         }
     }

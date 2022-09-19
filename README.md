@@ -67,6 +67,8 @@ $client = new ApiRequest();
 $client->service('notification');
 $client->url('/');
 $client->params(['email'=> 'tese@tes.com']);
+$client->debug(true);
+$client->verify(false);
 $client->send();
 ```
 

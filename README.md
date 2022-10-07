@@ -115,7 +115,7 @@ Create & Register Middleware on other end to validate each request with token. U
     {
         $allowedSecrets = explode(',', env('MY_SECRETS_TOKEN'));
 
-        if (in_array($request->header('Authorization'), $allowedSecrets)) {
+        if (in_array($request->header('Secret'), $allowedSecrets)) {
             return $next($request);
         }
 

@@ -17,7 +17,7 @@ class  ApiResponse
             $data = 'success';
         }
 
-        return response($data, $statusCode);
+        return $data;
     }
 
     /**

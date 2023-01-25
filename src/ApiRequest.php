@@ -26,7 +26,7 @@ class ApiRequest extends ApiResponse
     /**
      * @var string
      */
-    private $services = [];
+    protected $services = [];
 
     /**
      * @var string
@@ -41,7 +41,7 @@ class ApiRequest extends ApiResponse
     /**
      * @var string
      */
-    protected $params;
+    protected $params = [];
 
     /**
      * @var string
@@ -52,11 +52,6 @@ class ApiRequest extends ApiResponse
      * @var bool
      */
     protected $debug = false;
-
-    /**
-     * @var bool
-     */
-    protected $verify = true;
 
     /**
      * constructor
@@ -169,7 +164,20 @@ class ApiRequest extends ApiResponse
     public function params($params)
     {
         //
-        $this->params = $params;
+        $this->params = array_merge($this->params, $params);
+
+        return $this;
+    }
+
+
+    /**
+     * User
+     *
+     */
+    public function user($user = null)
+    {
+        //
+        $this->params = array_merge($this->params, ['user' => $user]);
 
         return $this;
     }
@@ -182,16 +190,6 @@ class ApiRequest extends ApiResponse
     {
         $this->debug = $debug;
     }
-
-    /**
-     * Verify
-     *
-     */
-    public function verify($verify = true)
-    {
-        $this->verify = $verify;
-    }
-
 
     /**
      * Headers
@@ -218,16 +216,17 @@ class ApiRequest extends ApiResponse
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($service, $method, $url, $params = [], $headers = [], $debug = false, $verify = true)
+    public function request($service, $method, $url, $user = null,  $params = [], $headers = [], $debug = false)
     {
         //
         $this->service($service);
         $this->url($url);
         $this->method($method);
         $this->params($params);
+        $this->user($user);
         $this->headers($headers);
         $this->debug($debug);
-        $this->verify($verify);
+
         return $this->send();
     }
 
@@ -260,7 +259,7 @@ class ApiRequest extends ApiResponse
             'timeout'  => 10.0,
             'base_uri' => $this->baseUri,
             'headers' => [
-                'Secret' => $this->secret,
+                'Authorization' => $this->secret,
                 'Accept'     => 'application/json',
                 'Content-Type'      => 'application/json'
             ]
@@ -273,23 +272,18 @@ class ApiRequest extends ApiResponse
                 $this->method,
                 $this->url,
                 [
-                    'json' => $this->params,
-                    'verify' => $this->verify,
-                    'debug' => $this->debug
+                    'json' => $this->params
                 ]
             );
 
             return $response->getBody()->getContents();
-
         } else {
             try {
                 $response =  $client->request(
                     $this->method,
                     $this->url,
                     [
-                        'json' => $this->params,
-                        'verify' => $this->verify,
-                        'debug' => $this->debug
+                        'json' => $this->params
                     ]
                 );
 
@@ -304,8 +298,7 @@ class ApiRequest extends ApiResponse
 
                 return $this->errorResponse($e);
             } catch (RequestException $e) {
-
-                return $this->errorRequest($this, $e->getHandlerContext()['error']);
+                return $this->errorRequest($this);
             }
         }
     }

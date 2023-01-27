@@ -259,7 +259,7 @@ class ApiRequest extends ApiResponse
             'timeout'  => 10.0,
             'base_uri' => $this->baseUri,
             'headers' => [
-                'Authorization' => $this->secret,
+                'Secret' => $this->secret,
                 'Accept'     => 'application/json',
                 'Content-Type'      => 'application/json'
             ]

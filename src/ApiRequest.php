@@ -3,6 +3,7 @@
 namespace Pathum4u\ApiRequest;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\Psr7\Request;
 use Pathum4u\ApiRequest\ApiResponse;
 use GuzzleHttp\Exception\ClientException;
@@ -39,12 +40,12 @@ class ApiRequest extends ApiResponse
     protected $url;
 
     /**
-     * @var string
+     * @var array
      */
     protected $params = [];
 
     /**
-     * @var string
+     * @var array
      */
     protected $headers = [];
 
@@ -52,6 +53,16 @@ class ApiRequest extends ApiResponse
      * @var bool
      */
     protected $debug = false;
+
+    /**
+     * @var array
+     */
+    protected $multipart = [];
+
+    /**
+     * @var array
+     */
+    protected $data = ['multipart' => []];
 
     /**
      * constructor
@@ -164,11 +175,25 @@ class ApiRequest extends ApiResponse
     public function params($params)
     {
         //
-        $this->params = array_merge($this->params, $params);
-
+        $this->data['multipart'] = array_merge($this->data['multipart'], $this->set_params($params));
+        // dd($this->data);
         return $this;
     }
 
+    /**
+     * Set multipart data
+     *
+     */
+    public function set_params($params)
+    {
+        $data = [];
+
+        foreach ($params as $key => $value) {
+            $data[] = ['name' => $key, 'contents' => $value];
+        }
+
+        return $data;
+    }
 
     /**
      * User
@@ -177,7 +202,41 @@ class ApiRequest extends ApiResponse
     public function user($user = null)
     {
         //
-        $this->params = array_merge($this->params, ['user' => $user]);
+        // $this->params = array_merge($this->params, ['user' => $user]);
+        $this->data['multipart'][] = ['name' => 'user', 'contents' => $user];
+
+        return $this;
+    }
+
+    /**
+     * files/multipart
+     *
+     */
+    public function attach($files)
+    {
+        //
+        $data = [];
+
+        if (is_array($files)) {
+            foreach ($files as $file) {
+                $data[] = array_filter([
+                    'contents' =>  Utils::tryFopen($file, 'r'),
+                    'filename' => $file->getClientOriginalName(),
+                ]);
+            }
+
+            $this->data['multipart'][] = ['name' => 'file', 'contents' => $data];
+            return $this;
+        }
+
+
+        $data = array_filter([
+            'name' => 'file',
+            'contents' =>   Utils::tryFopen($files, 'r'), //$files,
+            'filename' => $files->getClientOriginalName(),
+        ]);
+
+        $this->data['multipart'][] = $data;
 
         return $this;
     }
@@ -216,7 +275,7 @@ class ApiRequest extends ApiResponse
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($service, $method, $url, $user = null,  $params = [], $headers = [], $debug = false)
+    public function request($service, $method, $url, $user = null,  $params = [], $files = [], $headers = [], $debug = false)
     {
         //
         $this->service($service);
@@ -226,6 +285,7 @@ class ApiRequest extends ApiResponse
         $this->user($user);
         $this->headers($headers);
         $this->debug($debug);
+        $this->attach($files);
 
         return $this->send();
     }
@@ -242,7 +302,7 @@ class ApiRequest extends ApiResponse
             $this->method,
             $this->url,
             [
-                'json' => $this->params
+                'multipart' => $this->params
             ]
         );
     }
@@ -260,20 +320,22 @@ class ApiRequest extends ApiResponse
             'base_uri' => $this->baseUri,
             'headers' => [
                 'Secret' => $this->secret,
-                'Accept'     => 'application/json',
-                'Content-Type'      => 'application/json'
+                'Accept'     => 'application/multipart',
+                'Content-Type'      => 'application/multipart'
             ]
         ]);
-
 
         if ($this->debug) {
 
             $response =  $client->request(
                 $this->method,
                 $this->url,
-                [
-                    'json' => $this->params
-                ]
+                $this->data
+
+                // [
+                //     'multipart' => $this->params,
+                //     'multipart' => $this->multipart
+                // ]
             );
 
             return $response->getBody()->getContents();
@@ -282,9 +344,12 @@ class ApiRequest extends ApiResponse
                 $response =  $client->request(
                     $this->method,
                     $this->url,
-                    [
-                        'json' => $this->params
-                    ]
+                    $this->data
+
+                    // [
+                    //     'multipart' => $this->params,
+                    //     'multipart' => $this->multipart
+                    // ]
                 );
 
                 return $this->successResponse($response->getStatusCode(), $response->getBody()->getContents());

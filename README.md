@@ -66,13 +66,14 @@ return $client->request('notification','POST', '/test', $request->all(),[]);
 $client = new ApiRequest();
 $client->service('notification');
 $client->url('/');
-$client->user($request->user()->id);
+$client->user($request->user());
 $client->params(['email'=> 'tese@tes.com']); // $request->all()
 $client->debug(true);
-$client->attach($request->file('file')); // 
 $client->verify(false);
 $client->send();
 ```
+
+$client->json(); 
 
 ```
 $client = new ApiRequest();

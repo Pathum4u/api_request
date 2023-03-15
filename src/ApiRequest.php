@@ -251,6 +251,15 @@ class ApiRequest extends ApiResponse
     }
 
     /**
+     * Debug
+     *
+     */
+    public function json($params)
+    {
+        $this->data = ['json'=> $params];
+    }
+
+    /**
      * Headers
      *
      */

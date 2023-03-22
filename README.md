@@ -59,48 +59,18 @@ Request
 use Pathum4u\ApiRequest\ApiRequest;
 
 $client = new ApiRequest();
-return $client->request('notification','POST', '/test', $request->all(),[]);
+$client->service('notification')->post('/test', $request->all());
 ```
 
 ```
 $client = new ApiRequest();
-$client->service('notification');
-$client->url('/');
-$client->user($request->user());
-$client->params(['email'=> 'tese@tes.com']); // $request->all()
-$client->debug(true);
-$client->verify(false);
-$client->send();
+$client->service('notification')
+->dd()
+->adForm()
+->post(['email'=> 'tese@tes.com']); // $request->all()
 ```
 
-$client->json(); 
 
-```
-$client = new ApiRequest();
-$client->get('/');
-$client->send();
-```
-
-to get real response use
-
-```
-$chanel->debug(true);
-```
-
-Responses
--------
-
-Success
-
-```
-response()->json([$data], $statusCode)
-```
-
-Errors
-
-```
-response()->json(['error' => $response->getReasonPhrase(), 'message' => $this->errorMessage($responseBodyAsString)], $response->getStatusCode());
-```
 Other End
 ---------
 
@@ -126,6 +96,7 @@ Create & Register Middleware on other end to validate each request with token. U
         return response()->json(['message' => 'unauthorized token'], 401);
     }
 ```
+
 Acknowledgments
 ---------------
 
